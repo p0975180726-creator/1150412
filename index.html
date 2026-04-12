@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【教育訓練報名表】運用AI快速打造高效能表單工作坊</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 引入 FontAwesome 圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            /* 動感漸層背景 */
+            background: linear-gradient(135deg, #fcd34d 0%, #f472b6 50%, #8b5cf6 100%);
+            background-attachment: fixed;
+        }
+        /* 隱藏捲軸但保留滾動功能 (美觀) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.5); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.8); 
+        }
+        /* 自訂核取方塊與單選按鈕樣式 */
+        .option-card:checked + div {
+            background-color: #fff1f2; /* brand-50 */
+            border-color: #f43f5e; /* brand-500 */
+            color: #e11d48; /* brand-600 */
+            box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.2);
+            transform: translateY(-2px);
+        }
+        .transition-all-custom {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 antialiased font-sans py-8 px-4 sm:py-12 sm:px-8">
+
+    <!-- 成功提交後的覆蓋畫面 (預設隱藏) -->
+    <div id="successOverlay" class="fixed inset-0 z-50 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-500">
+        <div class="text-6xl text-pink-500 mb-4 animate-bounce"><i class="fa-solid fa-circle-check"></i></div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">報名成功！</h2>
+        <p class="text-lg text-gray-600 mb-6">我們已收到您的資料，期待在工作坊與您相見！</p>
+        <button onclick="location.reload()" class="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+            返回重新填寫
+        </button>
+    </div>
+
+    <!-- 主容器 -->
+    <main class="mx-auto w-full max-w-5xl bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up border border-white/40">
+        
+        <!-- 頂部標題區 (Hero) -->
+        <header class="relative px-8 py-12 text-center bg-white/50 border-b border-gray-100 overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500"></div>
+            <div class="inline-block p-3 rounded-2xl bg-gradient-to-tr from-pink-100 to-purple-100 text-pink-600 mb-4 shadow-sm">
+                <i class="fa-solid fa-robot text-4xl"></i>
+            </div>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 mb-4 tracking-tight">
+                【教育訓練報名表】<br class="hidden sm:block"><span class="text-2xl sm:text-3xl md:text-4xl mt-2 inline-block">運用AI快速打造高效能表單工作坊</span>
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+                本工作坊旨在介紹生成式 AI (如 Gemini) 的核心原理，並深入探討如何將其應用於教學部的日常行政、專案管理與文書處理中，以數據驅動決策，提升團隊效率與應變能力。
+            </p>
+        </header>
+
+        <!-- 內容區 -->
+        <div class="p-8 sm:p-12">
+            
+            <!-- 區塊一：活動資訊 & 議程 (兩欄式) -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-10 mb-12">
+                
+                <!-- 活動資訊 (左欄) -->
+                <div class="lg:col-span-2 space-y-6 bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-100/50">
+                    <h2 class="text-xl font-bold flex items-center text-indigo-800 border-b border-indigo-200 pb-3">
+                        <i class="fa-solid fa-circle-info mr-3 text-indigo-500"></i> 一、 活動資訊
+                    </h2>
+                    <ul class="space-y-5">
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center text-pink-500 shadow-sm mr-4">
+                                <i class="fa-regular fa-calendar-check text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-500 mb-1">日期</p>
+                                <p class="text-gray-800 font-medium">2026 年 03 月 31 日 (週二)</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center text-purple-500 shadow-sm mr-4">
+                                <i class="fa-regular fa-clock text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-500 mb-1">時間</p>
+                                <p class="text-gray-800 font-medium">14:00 - 15:00 (共 1 小時)</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-white flex items-center justify-center text-orange-500 shadow-sm mr-4">
+                                <i class="fa-solid fa-map-location-dot text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-500 mb-1">地點</p>
+                                <p class="text-gray-800 font-medium">大愛樓 3F 電腦教室</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 活動議程時間軸 (右欄) -->
+                <div class="lg:col-span-3">
+                    <h2 class="text-xl font-bold flex items-center text-gray-800 mb-6">
+                        <i class="fa-solid fa-list-timeline mr-3 text-pink-500"></i> 二、 活動議程
+                    </h2>
+                    <div class="relative border-l-4 border-pink-200 ml-4 space-y-6 pb-4">
+                        
+                        <!-- 項目 -->
+                        <div class="relative pl-6">
+                            <div class="absolute w-4 h-4 bg-pink-500 rounded-full -left-[10px] top-1.5 ring-4 ring-pink-100"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-1">
+                                <span class="font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded text-sm w-max">14:00 - 14:15</span>
+                                <span class="font-bold text-gray-800">報到與暖身 (Check-in)</span>
+                            </div>
+                            <p class="text-gray-600 text-sm">連接設備，進行數位工具破冰。</p>
+                        </div>
+
+                        <div class="relative pl-6">
+                            <div class="absolute w-4 h-4 bg-purple-500 rounded-full -left-[10px] top-1.5 ring-4 ring-purple-100"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-1">
+                                <span class="font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded text-sm w-max">14:15 - 14:30</span>
+                                <span class="font-bold text-gray-800">Session 1: 與 AI 共舞的藝術</span>
+                            </div>
+                            <p class="text-gray-600 text-sm">從指令工程 (Prompt Engineering) 入門。</p>
+                        </div>
+
+                        <div class="relative pl-6">
+                            <div class="absolute w-3 h-3 bg-gray-300 rounded-full -left-[8px] top-2"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2">
+                                <span class="font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded text-sm w-max">14:30 - 14:35</span>
+                                <span class="font-medium text-gray-500">中場休息 (Break)</span>
+                            </div>
+                        </div>
+
+                        <div class="relative pl-6">
+                            <div class="absolute w-4 h-4 bg-orange-500 rounded-full -left-[10px] top-1.5 ring-4 ring-orange-100"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-1">
+                                <span class="font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded text-sm w-max">14:35 - 14:50</span>
+                                <span class="font-bold text-gray-800">Session 2: 行政痛點擊破案例</span>
+                            </div>
+                            <p class="text-gray-600 text-sm">如何利用 AI 快速生成優化問卷數據分析。</p>
+                        </div>
+
+                        <div class="relative pl-6">
+                            <div class="absolute w-4 h-4 bg-blue-500 rounded-full -left-[10px] top-1.5 ring-4 ring-blue-100"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-1">
+                                <span class="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded text-sm w-max">14:50 - 14:55</span>
+                                <span class="font-bold text-gray-800">Workshop: AI 實戰演練</span>
+                            </div>
+                            <p class="text-gray-600 text-sm">請學員拿出目前手邊正在處理的一份問卷，現場利用 AI 工具進行實作。</p>
+                        </div>
+
+                        <div class="relative pl-6">
+                            <div class="absolute w-4 h-4 bg-green-500 rounded-full -left-[10px] top-1.5 ring-4 ring-green-100"></div>
+                            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2">
+                                <span class="font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded text-sm w-max">14:55 - 15:00</span>
+                                <span class="font-bold text-gray-800">總結與問答 (Q&A)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 表單開始 -->
+            <form id="registrationForm" onsubmit="handleFormSubmit(event)" class="space-y-12">
+                
+                <!-- 區塊三：報名基本資料 -->
+                <section class="bg-gray-50/50 p-6 sm:p-8 rounded-3xl border border-gray-100">
+                    <h2 class="text-2xl font-bold flex items-center text-gray-800 mb-8">
+                        <i class="fa-solid fa-user-pen mr-3 text-pink-500"></i> 三、 報名基本資料
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- 姓名 -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">姓名 <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" required placeholder="請輸入您的真實姓名" 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-shadow outline-none bg-white">
+                        </div>
+                        
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">電子郵件 (Email) <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" required placeholder="example@tzuchi.com.tw" 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-shadow outline-none bg-white">
+                        </div>
+                        
+                        <!-- 單位 -->
+                        <div class="md:col-span-2">
+                            <label class="block text-gray-700 font-semibold mb-2">單位 <span class="text-red-500">*</span></label>
+                            <input type="text" name="department" required placeholder="例如：教學部、護理部..." 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-shadow outline-none bg-white">
+                        </div>
+                    </div>
+
+                    <!-- 職稱 -->
+                    <div class="mb-8">
+                        <label class="block text-gray-700 font-semibold mb-3">職稱 <span class="text-red-500">*</span></label>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="job_title" value="醫師" required class="peer sr-only option-card" onchange="toggleOtherJobInput()">
+                                <div class="px-5 py-2.5 rounded-full border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-user-doctor"></i> 醫師
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="job_title" value="護理師" class="peer sr-only option-card" onchange="toggleOtherJobInput()">
+                                <div class="px-5 py-2.5 rounded-full border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-user-nurse"></i> 護理師
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="job_title" value="醫事人員" class="peer sr-only option-card" onchange="toggleOtherJobInput()">
+                                <div class="px-5 py-2.5 rounded-full border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-briefcase-medical"></i> 醫事人員
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="job_title" value="行政人員" class="peer sr-only option-card" onchange="toggleOtherJobInput()">
+                                <div class="px-5 py-2.5 rounded-full border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-desktop"></i> 行政人員
+                                </div>
+                            </label>
+                            <div class="flex items-center gap-2 relative">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="job_title" id="job_other_radio" value="其他" class="peer sr-only option-card" onchange="toggleOtherJobInput()">
+                                    <div class="px-5 py-2.5 rounded-full border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                        <i class="fa-solid fa-ellipsis"></i> 其他
+                                    </div>
+                                </label>
+                                <!-- 其他輸入框 (預設隱藏) -->
+                                <input type="text" id="job_other_text" placeholder="請註明..." 
+                                    class="hidden w-40 px-4 py-2.5 rounded-full border-2 border-pink-300 focus:ring-0 focus:border-pink-500 outline-none bg-white transition-all-custom">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 茶水點心 -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-3">是否需要茶水點心？ <span class="text-red-500">*</span></label>
+                        <div class="flex gap-4">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="need_snack" value="是" required class="peer sr-only option-card">
+                                <div class="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-mug-hot"></i> 是，我需要
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="need_snack" value="否" class="peer sr-only option-card">
+                                <div class="px-6 py-2.5 rounded-xl border-2 border-gray-200 text-gray-600 transition-all-custom font-medium hover:bg-gray-50 flex items-center gap-2">
+                                    <i class="fa-solid fa-xmark"></i> 否，不用客氣
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 區塊四：數位能力與需求調查 -->
+                <section class="bg-indigo-50/30 p-6 sm:p-8 rounded-3xl border border-indigo-100">
+                    <h2 class="text-2xl font-bold flex items-center text-gray-800 mb-8">
+                        <i class="fa-solid fa-square-poll-vertical mr-3 text-purple-500"></i> 四、 數位能力與需求調查
+                    </h2>
+
+                    <!-- Q6 -->
+                    <div class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <label class="block text-gray-800 font-bold mb-4 text-lg">
+                            6. 【AI 使用頻率】您目前的 AI 工具使用頻率為何？ <span class="text-sm font-normal text-gray-500 ml-2">(單選)</span> <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex flex-col gap-4">
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="ai_freq" value="重度使用者 (每天)" required class="peer sr-only option-card">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center justify-between">
+                                    <span class="font-medium">重度使用者</span>
+                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">(每天都會使用)</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="ai_freq" value="中度使用者 (每週2-3次)" class="peer sr-only option-card">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center justify-between">
+                                    <span class="font-medium">中度使用者</span>
+                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">(每週使用 2-3 次)</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="ai_freq" value="輕度使用者 (每月不到1次)" class="peer sr-only option-card">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center justify-between">
+                                    <span class="font-medium">輕度使用者</span>
+                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">(偶爾想到才用，一個月不到 1 次)</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer relative">
+                                <input type="radio" name="ai_freq" value="新手 (完全沒用過)" class="peer sr-only option-card">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center justify-between">
+                                    <span class="font-medium">新手</span>
+                                    <span class="text-sm text-gray-500 bg-white px-2 py-1 rounded-md shadow-sm border border-gray-100">(聽過但完全沒用過)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <label class="block text-gray-800 font-bold mb-4 text-lg">
+                            7. 【工具經驗】您曾經嘗試過哪些生成式 AI 工具？ <span class="text-sm font-normal text-gray-500 ml-2">(可複選)</span>
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Checkbox design similar to radio -->
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="ChatGPT (OpenAI)" class="peer sr-only option-card">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-gray-300 peer-checked:bg-pink-500 peer-checked:border-pink-500 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 peer-checked:opacity-100"></i>
+                                    </div>
+                                    <span class="font-medium">ChatGPT <span class="text-gray-400 text-sm font-normal">(OpenAI)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="Gemini (Google)" class="peer sr-only option-card">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-gray-300 peer-checked:bg-pink-500 peer-checked:border-pink-500 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 peer-checked:opacity-100"></i>
+                                    </div>
+                                    <span class="font-medium">Gemini <span class="text-gray-400 text-sm font-normal">(Google)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="Copilot (Microsoft)" class="peer sr-only option-card">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-gray-300 peer-checked:bg-pink-500 peer-checked:border-pink-500 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 peer-checked:opacity-100"></i>
+                                    </div>
+                                    <span class="font-medium">Copilot <span class="text-gray-400 text-sm font-normal">(Microsoft)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="Midjourney / DALL-E (繪圖類)" class="peer sr-only option-card">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors">
+                                        <!-- Custom checkmark handling via CSS above applies to div after input. Here we fake it simply by checking state in JS or CSS -->
+                                    </div>
+                                    <!-- Alternative checkmark design -->
+                                    <style>
+                                        input[type="checkbox"]:checked + div > div.checkbox-box {
+                                            background-color: #f43f5e; border-color: #f43f5e;
+                                        }
+                                        input[type="checkbox"]:checked + div > div.checkbox-box > i { opacity: 1; }
+                                    </style>
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">Midjourney / DALL-E <span class="text-gray-400 text-sm font-normal">(繪圖類)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="寫作輔助工具 (如 Notion AI)" class="peer sr-only option-card">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium truncate">寫作輔助工具 <span class="text-gray-400 text-sm font-normal">(如 Notion AI...)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="ai_tools" value="完全沒用過" class="peer sr-only option-card" onchange="toggleNoneExperience(this)">
+                                <div class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">完全沒用過</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <label class="block text-gray-800 font-bold mb-6 text-lg">
+                            8. 【信心指數】您對於「將 AI 應用在工作上」的信心分數？ <span class="text-sm font-normal text-gray-500 ml-2">(1-5分)</span> <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex justify-between items-start sm:px-4 gap-2 sm:gap-4">
+                            <!-- 分數 1-5 -->
+                            <div class="text-center flex-1">
+                                <label class="cursor-pointer block relative">
+                                    <input type="radio" name="confidence" value="1" required class="peer sr-only">
+                                    <div class="mx-auto w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-lg sm:text-xl font-bold text-gray-400 peer-checked:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white transition-all hover:border-pink-300 hover:scale-110 shadow-sm peer-checked:shadow-md">1</div>
+                                    <div class="mt-3 text-xs sm:text-sm text-gray-500 h-12 leading-tight">非常沒信心</div>
+                                </label>
+                            </div>
+                            <div class="text-center flex-1">
+                                <label class="cursor-pointer block relative">
+                                    <input type="radio" name="confidence" value="2" class="peer sr-only">
+                                    <div class="mx-auto w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-lg sm:text-xl font-bold text-gray-400 peer-checked:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white transition-all hover:border-pink-300 hover:scale-110 shadow-sm peer-checked:shadow-md">2</div>
+                                    <div class="mt-3 text-xs sm:text-sm text-gray-500 h-12"></div>
+                                </label>
+                            </div>
+                            <div class="text-center flex-1">
+                                <label class="cursor-pointer block relative">
+                                    <input type="radio" name="confidence" value="3" class="peer sr-only">
+                                    <div class="mx-auto w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-lg sm:text-xl font-bold text-gray-400 peer-checked:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white transition-all hover:border-pink-300 hover:scale-110 shadow-sm peer-checked:shadow-md">3</div>
+                                    <div class="mt-3 text-xs sm:text-sm text-gray-500 h-12 leading-tight">普通</div>
+                                </label>
+                            </div>
+                            <div class="text-center flex-1">
+                                <label class="cursor-pointer block relative">
+                                    <input type="radio" name="confidence" value="4" class="peer sr-only">
+                                    <div class="mx-auto w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-lg sm:text-xl font-bold text-gray-400 peer-checked:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white transition-all hover:border-pink-300 hover:scale-110 shadow-sm peer-checked:shadow-md">4</div>
+                                    <div class="mt-3 text-xs sm:text-sm text-gray-500 h-12"></div>
+                                </label>
+                            </div>
+                            <div class="text-center flex-1">
+                                <label class="cursor-pointer block relative">
+                                    <input type="radio" name="confidence" value="5" class="peer sr-only">
+                                    <div class="mx-auto w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-lg sm:text-xl font-bold text-gray-400 peer-checked:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white transition-all hover:border-pink-300 hover:scale-110 shadow-sm peer-checked:shadow-md">5</div>
+                                    <div class="mt-3 text-xs sm:text-sm text-gray-500 h-12 leading-tight">非常有信心</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q9 -->
+                    <div class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+                        <div class="absolute top-0 right-0 bg-orange-100 text-orange-600 px-3 py-1 rounded-bl-xl rounded-tr-xl text-sm font-bold">
+                            最多選 2 項
+                        </div>
+                        <label class="block text-gray-800 font-bold mb-4 text-lg pr-24">
+                            9. 【需求痛點】在行政工作中，您最希望 AI 幫您解決哪一類問題？ <span class="text-sm font-normal text-gray-500 ml-2">(可複選，至多選 2 項)</span>
+                        </label>
+                        <div class="flex flex-col gap-4">
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="文案撰寫" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">文案撰寫 <span class="text-gray-500 font-normal ml-1">(公文、新聞稿、信件潤飾)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="會議記錄" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">會議記錄 <span class="text-gray-500 font-normal ml-1">(逐字稿整理、摘要重點)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="數據處理" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">數據處理 <span class="text-gray-500 font-normal ml-1">(Excel 公式生成、數據分析解讀)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="簡報製作" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">簡報製作 <span class="text-gray-500 font-normal ml-1">(PPT 大綱生成、排版設計)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="資訊檢索" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">文案撰寫 <span class="text-gray-500 font-normal ml-1">(公文、新聞稿、信件潤飾)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="會議" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">會議記錄 <span class="text-gray-500 font-normal ml-1">(逐字稿整理、摘要重點)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="數據" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">數據處理 <span class="text-gray-500 font-normal ml-1">(Excel 公式生成、數據分析解讀)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="簡報" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">簡報製作 <span class="text-gray-500 font-normal ml-1">(PPT 大綱生成、排版設計)</span></span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="pain_points" value="檢索" class="peer sr-only option-card pain-point-cb" onchange="limitCheckboxes()">
+                                <div class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 text-gray-700 transition-all-custom hover:bg-gray-50 flex items-center gap-3">
+                                    <div class="checkbox-box w-5 h-5 rounded border border-gray-300 flex items-center justify-center transition-colors flex-shrink-0">
+                                        <i class="fa-solid fa-check text-white text-xs opacity-0 transition-opacity"></i>
+                                    </div>
+                                    <span class="font-medium">資訊檢索 <span class="text-gray-500 font-normal ml-1">(快速找法規、整理文獻)</span></span>
+                                </div>
+                            </label>
+                        </div>
+                        <p id="pain_point_warning" class="text-red-500 text-sm mt-2 hidden font-medium">※ 已達到最多 2 項的選擇上限</p>
+                    </div>
+
+                    <!-- Q10 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                        <label class="block text-gray-800 font-bold mb-4 text-lg">
+                            10. 【會前補充】您目前在行政工作上遇到的最大困難，或想對講師說的話：
+                        </label>
+                        <textarea name="comments" rows="4" placeholder="歡迎暢所欲言，這將幫助講師更了解大家的需求..." 
+                            class="w-full px-5 py-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-shadow outline-none resize-none bg-gray-50 focus:bg-white"></textarea>
+                    </div>
+
+                </section>
+
+                <!-- 提交按鈕 -->
+                <div class="text-center pt-6 pb-4">
+                    <button type="submit" id="submitBtn"
+                        class="group relative inline-flex items-center justify-center px-12 py-4 text-xl font-bold text-white transition-all duration-200 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 border border-transparent rounded-full shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 overflow-hidden">
+                        <div class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -skew-x-12 -ml-8 w-1/2"></div>
+                        <span class="relative flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> 確認送出報名
+                        </span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- 底部資訊 -->
+        <footer class="bg-gray-50 border-t border-gray-200 p-6 sm:p-8 text-sm text-gray-500 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="space-y-1 text-center md:text-left">
+                <p><span class="font-bold text-gray-700">主辦單位：</span>大林慈濟醫院教學部</p>
+                <p><span class="font-bold text-gray-700">聯絡人：</span>吳秉南 (分機33455)</p>
+            </div>
+            <div class="text-center md:text-right bg-yellow-50 text-yellow-700 px-4 py-2 rounded-lg border border-yellow-200">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i> 備註：本報名資料僅供本次工作坊聯繫與餐點統計使用。
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- 頁面底部裝飾空間 -->
+    <div class="h-12 w-full"></div>
+
+    <script>
+        // 職稱選擇「其他」時顯示輸入框
+        function toggleOtherJobInput() {
+            const otherRadio = document.getElementById('job_other_radio');
+            const otherText = document.getElementById('job_other_text');
+            
+            if (otherRadio.checked) {
+                otherText.classList.remove('hidden');
+                otherText.setAttribute('required', 'required');
+                otherText.focus();
+            } else {
+                otherText.classList.add('hidden');
+                otherText.removeAttribute('required');
+                otherText.value = ''; // 清空內容
+            }
+        }
+
+        // Q7 工具經驗：如果選了「完全沒用過」，取消其他選項；如果選了其他，取消「完全沒用過」
+        function toggleNoneExperience(noneCheckbox) {
+            const allToolCheckboxes = document.querySelectorAll('input[name="ai_tools"]');
+            if (noneCheckbox.checked) {
+                allToolCheckboxes.forEach(cb => {
+                    if (cb !== noneCheckbox) cb.checked = false;
+                });
+            }
+        }
+        
+        document.querySelectorAll('input[name="ai_tools"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.value !== '完全沒用過' && this.checked) {
+                    const noneOption = document.querySelector('input[name="ai_tools"][value="完全沒用過"]');
+                    if(noneOption) noneOption.checked = false;
+                }
+            });
+        });
+
+        // Q9 需求痛點：最多選擇 2 項
+        function limitCheckboxes() {
+            const checkboxes = document.querySelectorAll('.pain-point-cb');
+            const checkedCount = document.querySelectorAll('.pain-point-cb:checked').length;
+            const warningMsg = document.getElementById('pain_point_warning');
+            
+            if (checkedCount >= 2) {
+                checkboxes.forEach(cb => {
+                    if (!cb.checked) {
+                        cb.disabled = true;
+                        cb.nextElementSibling.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                });
+                warningMsg.classList.remove('hidden');
+            } else {
+                checkboxes.forEach(cb => {
+                    cb.disabled = false;
+                    cb.nextElementSibling.classList.remove('opacity-50', 'cursor-not-allowed');
+                });
+                warningMsg.classList.add('hidden');
+            }
+        }
+
+        // 處理表單送出
+        function handleFormSubmit(event) {
+            event.preventDefault(); // 阻止預設送出行為
+            
+            const form = event.target;
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnContent = submitBtn.innerHTML;
+
+            // 變更按鈕狀態為讀取中
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 資料傳送中...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+
+            // 處理「其他」職稱，若選其他則將輸入框的值覆蓋進去
+            if (formData.get('job_title') === '其他') {
+                const otherText = document.getElementById('job_other_text').value;
+                formData.set('job_title', otherText ? '其他: ' + otherText : '其他');
+            }
+
+            // 處理複選題：將陣列轉為逗號分隔字串 (Apps Script 較好解析)
+            const aiTools = Array.from(document.querySelectorAll('input[name="ai_tools"]:checked')).map(cb => cb.value).join(', ');
+            formData.set('ai_tools', aiTools);
+
+            const painPoints = Array.from(document.querySelectorAll('input[name="pain_points"]:checked')).map(cb => cb.value).join(', ');
+            formData.set('pain_points', painPoints);
+
+            // ==========================================
+            // ★ 請將下方網址替換成您的 Google Apps Script 部署網址 ★
+            // ==========================================
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwu4ezAlnQyo0pP3lrUAM0VP5tX6zts9znS0a3xyyE-LypmuQ3A-Yd89xpQJBAK5Oba_g/exec';
+
+            if(scriptURL.includes('請貼上您的')) {
+                alert('系統提示：您尚未填寫 Google Apps Script 網址，資料將無法送出至 Google Sheets。');
+                submitBtn.innerHTML = originalBtnContent;
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // 送出資料至 Google Apps Script
+            fetch(scriptURL, { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(response => {
+                // 顯示成功動畫覆蓋層
+                const overlay = document.getElementById('successOverlay');
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    overlay.classList.add('opacity-100');
+                }, 50);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert('表單送出發生錯誤，請稍後再試。');
+                submitBtn.innerHTML = originalBtnContent;
+                submitBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
